@@ -1,71 +1,88 @@
-const xhttp = new XMLHttpRequest();
-const url = "https://pokeapi.co/api/v2/pokemon?limit=30";
+const jumlahPokemon = 84;
+const url = `https://pokeapi.co/api/v2/pokemon?limit=${jumlahPokemon}`;
 
-async function fetchData1(url) {
-    const response = await fetch(url, {
-        method: "GET",
-    });
-    const json = await response.json();
-    return json;
-};
+async function getPokemon() {
+    fetch(url)
+        .then(function(res) {
+            res.json()
+                .then(function(data) {
+                    data.results.forEach(pokemon => {
+                        getDetailPokemon(pokemon);
+                    });
+                })
+        })
+}
 
-async function fetchData() {
-    xhttp.onload = function() {
-        const response = JSON.parse(this.responseText);
-        const results = response.results;
-        let data = "";
+async function getDetailPokemon(detail) {
+    details = detail.url;
+    fetch(details)
+        .then(function(res) {
+            res.json()
+                .then(function(dataDP) {
+                    viewPokemon(dataDP);
+                })
+        })
+}
 
-        for(i = 0; i < results.length; i++) {
-            const hasil = fetchData1(results[i].url);
+function viewPokemon(x) {
+    const pokeType =  x.types[0].type.name;
+    let row = document.getElementById("listPoke")
+    let div = document.createElement("div");
+    let data = "";
 
-            hasil.then(function(result) {
-                console.log(result);
-                let pType = result.types[0].type.name;
-                let color = "";
+    switch(pokeType) {
+        case "bug":
+            colorBg = "#9AE66E";
+            colorTx = "#000";
+            break;
+        case "fire":
+            colorBg = "#FFC93C";
+            colorTx = "#000";
+            break;
+        case "grass":
+            colorBg = "#B4FF9F";
+            colorTx = "#000";
+            break;
+        case "water":
+            colorBg = "#A2EAE2";
+            colorTx = "#000";
+            break;
+        case "normal":
+            colorBg = "#EEEEEE";
+            colorTx = "#000";
+            break;
+        case "electric":
+            colorBg = "#F6F54D";
+            colorTx = "#000";
+            break;
+        case "poison":
+            colorBg = "#ECA3F5";
+            colorTx = "#000";
+            break;
+        case "ground":
+            colorBg = "#ECB365";
+            colorTx = "#000";
+            break;
+        default:
+            colorBg = "#000";
+            colorTx = "#fff";
+            break;
+    }
 
-                switch (pType) {
-                    case "bug":
-                        color = "#FAFFAF";
-                        break;
-                    case "fire":
-                        color = "#F77E21";
-                        break;
-                    case "grass":
-                        color = "#14C38E";
-                        break;
-                    case "water":
-                        color = "#4CACBC";
-                        break;
-                    case "normal":
-                        color = "#D0C9C0";
-                        break;
-                    case "electric":
-                        color = "#F9D923";
-                        break;
-                    case "poison":
-                        color = "#AB46D2";
-                        break;
-                    default:
-                        color = "#EFFFFD";
-                        break;
-                }
-                
-                data = data + `
-                    <div class="" style="width: 8rem; inline-black; background: ${color}; text-align: center">
-                        <img src="${result.sprites.front_shiny}" class="card-img-top" alt="">
-                        <ul class="list-group list-group-flush" style="color: #000; background: ${color}; font-size: 12px;">
-                            <li class="list-group" id="id">${result.id}</li>
-                            <li class="list-group" id="name">${result.name}</li>
-                            <li class="list-group" id="type">Type: ${result.types[0].type.name}</li>
-                        </ul>
-                    </div>
-                    <p>
-                    `;
-
-                document.getElementById("pokemon").innerHTML = data;
-            });
-        }
-    };
-    xhttp.open("GET", url);
-    xhttp.send();
+    div.classList.add("col-sm-2");
+    data += 
+        `
+            <br>
+            <div class="card" style=" width: 10rem; height:17rem; background-color: ${colorBg}; color: ${colorTx}">
+               <div class="card-body">
+                    <img src='${x.sprites.front_shiny}' class="card-img-top"/>
+                    <p class="text-center" style=" font-weight: bold;">${x.name}</p>
+                    <p>Nomor: ${x.id}</p>
+                    <p class="text-center">Tipe: ${pokeType}</p>
+                </div>
+            </div>
+            <p></p>
+        `;
+    div.innerHTML = data;
+    row.appendChild(div);
 }
